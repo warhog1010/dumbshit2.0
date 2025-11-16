@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Do You Belong With Me?</title>
+  <style>
+    :root{--bg:#0f172a;--card:#0b1220;--accent:#7c3aed;--muted:#9aa4b2}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(135deg,var(--bg),#071029);color:#e6eef8;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);padding:28px;border-radius:16px;max-width:640px;width:100%;box-shadow:0 10px 30px rgba(2,6,23,0.6)}
+    h1{margin:0 0 8px;font-size:20px}
+    p.lead{margin:0 0 20px;color:var(--muted)}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    input[type=text]{flex:1;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;outline:none}
+    button{padding:10px 14px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:600;cursor:pointer}
+    .result{margin-top:18px;padding:16px;border-radius:12px;background:linear-gradient(180deg,rgba(124,58,237,0.08),rgba(124,58,237,0.03));text-align:center;font-size:18px}
+    .small{font-size:13px;color:var(--muted);margin-top:8px}
+    .heart{display:inline-block;margin-left:8px;transform-origin:center;transition:transform .18s ease}
+    .heart.boom{transform:scale(1.35)}
+    footer{margin-top:16px;text-align:right;color:var(--muted);font-size:12px}
+    @media (max-width:520px){.row{flex-direction:column}button{width:100%}}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Do you belong with me?</h1>
+    <p class="lead">Enter a name — only <strong>Raiha</strong> will get a positive response.</p>
+
+    <label class="small">Enter a name:</label>
+    <div class="row" style="margin-top:8px">
+      <input id="guessInput" type="text" placeholder="Type a name and press Check" aria-label="Name input" />
+      <button id="checkBtn">Check</button>
+    </div>
+
+    <div id="result" class="result" style="display:none" role="status" aria-live="polite"></div>
+
+    <footer>
+      Tip: press Enter to check.
+    </footer>
+  </div>
+
+  <script>
+    const guessInput = document.getElementById('guessInput');
+    const checkBtn = document.getElementById('checkBtn');
+    const result = document.getElementById('result');
+
+    const SECRET = "raiha"; // hard-coded allowed name
+
+    const normalize = s => (s||"").trim().toLowerCase();
+
+    checkBtn.addEventListener('click', ()=>{
+      const guess = normalize(guessInput.value);
+
+      if(!guess){
+        showMessage('Please type a name to check.');
+        return;
+      }
+
+      if(guess === SECRET){
+        showMatch(guessInput.value.trim());
+      } else {
+        showMessage('Sorry, next please');
+      }
+    });
+
+    function showMessage(text){
+      result.style.display = 'block';
+      result.innerHTML = `<span>${escapeHtml(text)}</span>`;
+    }
+
+    function showMatch(name){
+      result.style.display = 'block';
+      const safeName = escapeHtml(name);
+      result.innerHTML = `<strong>${safeName}, you belong with me</strong><span class="heart">❤️</span>`;
+      const h = result.querySelector('.heart');
+      if(h){
+        h.classList.add('boom');
+        setTimeout(()=>h.classList.remove('boom'),350);
+      }
+    }
+
+    function escapeHtml(unsafe){
+      return unsafe
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    guessInput.addEventListener('keydown', e=>{ if(e.key === 'Enter') checkBtn.click(); });
+  </script>
+</body>
+</html>
